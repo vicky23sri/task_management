@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2/dist/alpine.min.js" defer></script>
+</head>
+
+<body class="bg-gray-100 p-6">
+    <div class="flex divide-x divide-gray-800 mb-6">
+        <button @click="changeContent('management/tasks')"
+            class="align-middle select-none font-sans font-bold text-center uppercase transition-all text-xs py-3 px-6 bg-gray-100 text-black shadow-md hover:bg-blue-700 hover:text-white focus:bg-blue-700 focus:text-white focus:outline-none rounded-l-lg"
+            :class="{ 'bg-blue-700 text-white': currentContent === 'management/tasks' }" type="button">
+            <i class="fas fa-file-invoice mr-2"></i> Tasks
+        </button>
+        <button @click="changeContent('management/kanban')"
+            class="align-middle select-none font-sans font-bold text-center uppercase transition-all text-xs py-3 px-6 bg-gray-100 text-black shadow-md hover:bg-blue-700 hover:text-white focus:bg-blue-700 focus:text-white focus:outline-none"
+            :class="{ 'bg-blue-700 text-white': currentContent === 'management/kanban' }" type="button">
+            <i class="fas fa-cart-plus mr-2"></i> Kanaban Board
+        </button>
+        <button @click="changeContent('management/message')"
+            class="align-middle select-none font-sans font-bold text-center uppercase transition-all text-xs py-3 px-6 bg-gray-100 text-black shadow-md hover:bg-blue-700 hover:text-white focus:bg-blue-700 focus:text-white focus:outline-none"
+            :class="{ 'bg-blue-700 text-white': currentContent === 'management/message' }" type="button">
+            <i class="fas fa-quote-right mr-2"></i> Messages
+        </button>
+        <button @click="changeContent('management/file')"
+            class="align-middle select-none font-sans font-bold text-center uppercase transition-all text-xs py-3 px-6 bg-gray-100 text-black shadow-md hover:bg-blue-700 hover:text-white focus:bg-blue-700 focus:text-white focus:outline-none"
+            :class="{ 'bg-blue-700 text-white': currentContent === 'management/file' }" type="button">
+            <i class="fas fa-money-bill-trend-up mr-2"></i> Files
+        </button>
+    </div>
+
+    <div x-data="fileUploader()" class="mx-auto">
+        <h1 class="text-4xl font-bold mb-8 text-start text-gray-800">File Management System</h1>
+        
+        <div class="mb-8">
+            <div
+                @dragover.prevent="dragover = true"
+                @dragleave.prevent="dragover = false"
+                @drop.prevent="handleDrop($event)"
+                :class="{'border-blue-500 bg-blue-50': dragover}"
+                class="border-dashed border-2 border-gray-300 rounded-lg p-8 text-center transition-colors duration-300 ease-in-out"
+            >
+                <input type="file" @change="handleFileUpload" multiple class="hidden" id="fileInput">
+                <label for="fileInput" class="cursor-pointer">
+                    <i class="fas fa-cloud-upload-alt text-4xl mb-4 text-blue-500"></i>
+                    <p class="text-xl font-semibold text-gray-700">Drag and drop files here or click to upload</p>
+                    <p class="text-sm text-gray-500 mt-2">Supported formats: PDF, DOCX, JPG, PNG, and more</p>
+                </label>
+            </div>
+        </div>
+
+        <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+            <div class="px-6 py-4 bg-blue-500 text-white flex justify-between items-center">
+                <h2 class="text-xl font-semibold">Uploaded Files</h2>
+                <p class="text-sm"><span x-text="files.length"></span> files</p>
+            </div>
+            <table class="w-full">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">File Name</th>
+                        <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Size</th>
+                        <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                        <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    <template x-for="(file, index) in files" :key="index">
+                        <tr class="hover:bg-gray-50 transition-colors duration-200">
+                            <td class="py-4 px-6">
+                                <div class="flex items-center">
+                                    <i :class="getFileIcon(file.type)" class="mr-3 text-gray-400"></i>
+                                    <span class="font-medium text-gray-900" x-text="file.name"></span>
+                                </div>
+                            </td>
+                            <td class="py-4 px-6 text-sm text-gray-500" x-text="formatFileSize(file.size)"></td>
+                            <td class="py-4 px-6 text-sm text-gray-500" x-text="file.type"></td>
+                            <td class="py-4 px-6 text-sm">
+                                <button @click="openRemoveModal(index)" class="text-red-500 hover:text-red-700 transition-colors duration-200">
+                                    <i class="fas fa-trash"></i> Remove
+                                </button>
+                            </td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Confirmation Modal -->
+        <div x-show="showModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" x-cloak>
+            <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+                <div class="mt-3 text-center">
+                    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+                        <i class="fas fa-exclamation-triangle text-red-600"></i>
+                    </div>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 mt-5">Confirm Removal</h3>
+                    <div class="mt-2 px-7 py-3">
+                        <p class="text-sm text-gray-500">
+                            Are you sure you want to remove this file?
+                        </p>
+                        <p class="text-sm font-medium text-gray-800 mt-2" x-text="fileToRemove ? fileToRemove.name : ''"></p>
+                    </div>
+                    <div class="items-center px-4 py-3">
+                        <button @click="removeFile" class="px-4 py-2 bg-red-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300">
+                            Remove
+                        </button>
+                        <button @click="showModal = false" class="mt-3 px-4 py-2 bg-gray-300 text-gray-800 text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,1 @@
+// install the franken ui use this link https://www.franken-ui.dev/docs/installation

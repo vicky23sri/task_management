@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2/dist/alpine.min.js" defer></script>
+</head>
+
+<body class="bg-gray-100 p-6">
+  <div class="flex divide-x divide-gray-800 mb-6">
+    <button @click="changeContent('management/tasks')"
+      class="align-middle select-none font-sans font-bold text-center uppercase transition-all text-xs py-3 px-6 bg-gray-100 text-black shadow-md hover:bg-blue-700 hover:text-white focus:bg-blue-700 focus:text-white focus:outline-none rounded-l-lg"
+      :class="{ 'bg-blue-700 text-white': currentContent === 'management/tasks' }" type="button">
+      <i class="fas fa-file-invoice mr-2"></i> Tracker
+    </button>
+    <button @click="changeContent('management/kanban')"
+      class="align-middle select-none font-sans font-bold text-center uppercase transition-all text-xs py-3 px-6 bg-gray-100 text-black shadow-md hover:bg-blue-700 hover:text-white focus:bg-blue-700 focus:text-white focus:outline-none"
+      :class="{ 'bg-blue-700 text-white': currentContent === 'management/kanban' }" type="button">
+      <i class="fas fa-cart-plus mr-2"></i> Kanaban Board
+    </button>
+    <button @click="changeContent('management/message')"
+      class="align-middle select-none font-sans font-bold text-center uppercase transition-all text-xs py-3 px-6 bg-gray-100 text-black shadow-md hover:bg-blue-700 hover:text-white focus:bg-blue-700 focus:text-white focus:outline-none"
+      :class="{ 'bg-blue-700 text-white': currentContent === 'management/message' }" type="button">
+      <i class="fas fa-quote-right mr-2"></i> Messages
+    </button>
+    <button @click="changeContent('management/file')"
+      class="align-middle select-none font-sans font-bold text-center uppercase transition-all text-xs py-3 px-6 bg-gray-100 text-black shadow-md hover:bg-blue-700 hover:text-white focus:bg-blue-700 focus:text-white focus:outline-none"
+      :class="{ 'bg-blue-700 text-white': currentContent === 'management/file' }" type="button">
+      <i class="fas fa-money-bill-trend-up mr-2"></i> Files
+    </button>
+  </div>
+
+  <body class="bg-gray-100 p-6">
+    <div class="flex flex-col md:flex-row justify-between items-start mb-6 space-y-4 md:space-y-0">
+      <h1 class="text-3xl font-bold">Tasks</h1>
+      <div class="relative flex items-center w-full md:w-auto">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+            stroke="currentColor" class="w-5 h-5 text-gray-400">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+          </svg>
+        </span>
+        <input type="text" placeholder="Search"
+          class="bg-gray-100 block w-full py-2 pr-5 text-gray-700 border border-gray-200 rounded-lg md:w-80 placeholder-gray-400 pl-10 focus:border-blue-400 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40">
+      </div>
+    </div>
+
+    <div x-data="{ 
+      tasks: [
+          {id: '001', description: 'Design Homepage', name: 'John Doe', dueDate: '2024-07-15', status: 'In Progress', priority: 'High', files: 3, seniorHours: 10, seniorProfiles: ['John Doe', 'Jane Smith'], comments: ['Looking good so far!', 'Need to adjust the color scheme']},
+          {id: '002', description: 'Develop Feature X', name: 'Jane Smith', dueDate: '2024-07-20', status: 'Working On', priority: 'High', files: 5, seniorHours: 15, seniorProfiles: ['Alice Johnson'], comments: ['API integration pending']},
+          {id: '003', description: 'Review Design', name: 'Alice Johnson', dueDate: '2024-07-25', status: 'In Progress', priority: 'Medium', files: 2, seniorHours: 8, seniorProfiles: ['Bob Brown', 'Charlie Davis'], comments: ['Feedback provided', 'Waiting for revisions']},
+          {id: '004', description: 'Write Tests', name: 'Bob Brown', dueDate: '2024-07-30', status: 'Done', priority: 'Medium', files: 4, seniorHours: 6, seniorProfiles: ['Dana Lee'], comments: ['All tests passing']},
+          {id: '005', description: 'Onboard New Employee', name: 'Charlie Davis', dueDate: '2024-08-05', status: 'Done', priority: 'Low', files: 1, seniorHours: 4, seniorProfiles: ['John Doe'], comments: ['Orientation completed']},
+          {id: '006', description: 'Employee Training', name: 'Dana Lee', dueDate: '2024-08-10', status: 'Working On', priority: 'Low', files: 2, seniorHours: 5, seniorProfiles: ['Jane Smith', 'Alice Johnson'], comments: ['Materials prepared', 'Schedule set']}
+      ],
+      showNewTaskRow: false,
+      newTask: {
+        description: '', name: '', dueDate: '', status: '', priority: '', files: 0, seniorHours: 0,
+        seniorProfiles: [], comments: []
+      },
+      addNewTask() {
+        this.tasks.push({...this.newTask, id: (this.tasks.length + 1).toString().padStart(3, '0')});
+        this.newTask = {description: '', name: '', dueDate: '', status: '', priority: '', files: 0, seniorHours: 0, seniorProfiles: [], comments: []};
+        this.showNewTaskRow = false;
+      },
+      getStatusColor(status) {
+          return {
+              'In Progress': 'bg-red-500 text-white',
+              'Working On': 'bg-yellow-500 text-white',
+              'Done': 'bg-green-500 text-white'
+          }[status] || 'bg-gray-500 text-white';
+      },
+      getPriorityColor(priority) {
+          return {
+              'High': 'bg-red-500 text-white',
+              'Medium': 'bg-yellow-500 text-white',
+              'Low': 'bg-indigo-500 text-white'
+          }[priority] || 'bg-gray-500 text-white';
+      },
+      getSummary(tasks) {
+          const summary = {
+              totalFiles: tasks.reduce((sum, task) => sum + task.files, 0),
+              totalSeniorHours: tasks.reduce((sum, task) => sum + task.seniorHours, 0),
+              statusCounts: {},
+              priorityCounts: {}
+          };
+          tasks.forEach(task => {
+              summary.statusCounts[task.status] = (summary.statusCounts[task.status] || 0) + 1;
+              summary.priorityCounts[task.priority] = (summary.priorityCounts[task.priority] || 0) + 1;
+          });
+          return summary;
+      },
+      getPercentage(count, total) {
+          return ((count / total) * 100).toFixed(1) + '%';
+      }
+  }" class="mx-auto my-8 space-y-8">
+  
+      <!-- Table Template -->
+      <template x-for="(tableData, index) in [
+          {title: 'All Tasks', tasks: tasks},
+          {title: 'In Progress', tasks: tasks.filter(t => t.status === 'In Progress')},
+          {title: 'Done', tasks: tasks.filter(t => t.status === 'Done')}
+      ]">
+        <div class="bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200">
+          <div
+            class="px-6 py-4 bg-gradient-to-r from-blue-500 to-blue-600 border-b border-gray-200 flex justify-between items-center">
+            <h2 class="text-2xl font-bold text-white" x-text="tableData.title"></h2>
+            <template x-if="index === 0">
+              <button
+                @click="showNewTaskRow = !showNewTaskRow"
+                class="bg-white text-blue-600 px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-50 transition-colors duration-200 ease-in-out">
+                + New Task
+              </button>
+            </template>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <template
+                    x-for="header in ['', 'Task', 'Owner', 'Due Date', 'Senior Profile', 'Status', 'Priority', 'Files', 'Senior Hours']">
+                    <th
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 border-r border-gray-200 uppercase tracking-wider"
+                      x-text="header"></th>
+                  </template>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr x-show="showNewTaskRow" class="bg-gray-100">
+                  <td class="px-6 py-4 whitespace-nowrap border-r border-gray-200">
+                    <button @click="addNewTask" class="text-green-500 hover:text-green-700">Save</button>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap border-r border-gray-200">
+                    <input x-model="newTask.description" class="w-full p-1 border rounded" placeholder="Task description">
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap border-r border-gray-200">
+                    <input x-model="newTask.name" class="w-full p-1 border rounded" placeholder="Owner name">
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap border-r border-gray-200">
+                    <input x-model="newTask.dueDate" type="date" class="w-full p-1 border rounded">
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap border-r border-gray-200">
+                    <input x-model="newTask.seniorProfiles" class="w-full p-1 border rounded" placeholder="Senior profiles (comma-separated)">
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap border-r border-gray-200">
+                    <select x-model="newTask.status" class="w-full p-1 border rounded">
+                      <option value="">Select status</option>
+                      <option value="In Progress">In Progress</option>
+                      <option value="Working On">Working On</option>
+                      <option value="Done">Done</option>
+                    </select>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap border-r border-gray-200">
+                    <select x-model="newTask.priority" class="w-full p-1 border rounded">
+                      <option value="">Select priority</option>
+                      <option value="High">High</option>
+                      <option value="Medium">Medium</option>
+                      <option value="Low">Low</option>
+                    </select>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap border-r border-gray-200">
+                    <input x-model.number="newTask.files" type="number" class="w-full p-1 border rounded" min="0">
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <input x-model.number="newTask.seniorHours" type="number" class="w-full p-1 border rounded" min="0">
+                  </td>
+                </tr>
+                <template x-for="task in tableData.tasks" :key="task.id">
+                  <tr class="hover:bg-gray-50 transition-colors duration-150 ease-in-out border-b border-gray-200">
+                    <td class="px-6 py-4 whitespace-nowrap border-r border-gray-200">
+                      <input type="checkbox" class="rounded text-blue-600 focus:ring-blue-500 cursor-pointer">
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap border-r border-gray-200">
+                      <div class="flex items-center">
+                        <div class="text-sm font-medium text-gray-900" x-text="task.description"></div>
+                        <div class="ml-2 text-gray-500 cursor-pointer" x-show="task.comments.length > 0">
+                          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z">
+                            </path>
+                          </svg>
+                        </div>
+                      </div>
+                      <div class="text-xs text-gray-500" x-text="'#' + task.id"></div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap border-r border-gray-200">
+                      <div class="flex items-center">
+                        <div class="flex-shrink-0 h-8 w-8">
+                          <img class="h-8 w-8 rounded-full"
+                            :src="'https://ui-avatars.com/api/?name=' + encodeURIComponent(task.name) + '&color=7F9CF5&background=EBF4FF'"
+                            :alt="task.name">
+                        </div>
+                        <div class="ml-4">
+                          <div class="text-sm font-medium text-gray-900" x-text="task.name"></div>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap border-r border-gray-200">
+                      <div class="text-sm text-gray-900" x-text="task.dueDate"></div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap border-r border-gray-200 relative">
+                      <div class="flex -space-x-2 overflow-hidden justify-center">
+                        <template x-for="(profile, index) in task.seniorProfiles.slice(0, 3)">
+                          <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white"
+                            :src="'https://ui-avatars.com/api/?name=' + encodeURIComponent(profile) + '&color=7F9CF5&background=EBF4FF'"
+                            :alt="profile">
+                        </template>
+                        <template x-if="task.seniorProfiles.length > 3">
+                          <span
+                            class="inline-flex items-center justify-center h-6 w-6 rounded-full bg-gray-300 text-xs font-medium text-gray-800"
+                            x-text="'+' + (task.seniorProfiles.length - 3)"
+                            x-tooltip="{ content: () => {
+                              return task.seniorProfiles.slice(3).join(', ');
+                            }}">
+                          </span>
+                        </template>
+                      </div>
+                    </td>                    
+                    <td class="px-6 py-4 whitespace-nowrap border-r border-gray-200">
+                      <div class="flex items-center space-x-2">
+                        <span class="px-2 py-1 text-xs leading-5 font-semibold rounded-full"
+                          :class="getStatusColor(task.status)" x-text="task.status"></span>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap border-r border-gray-200">
+                      <span class="px-2 py-1 text-xs leading-5 font-semibold rounded-full"
+                        :class="getPriorityColor(task.priority)" x-text="task.priority"></span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap border-r border-gray-200">
+                      <div class="flex items-center space-x-2">
+                        <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                          </path>
+                        </svg>
+                        <span x-text="task.files" class="text-sm font-medium text-gray-900"></span>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap" x-text="task.seniorHours"></td>
+                  </tr>
+                </template>
+              </tbody>
+              <tfoot class="bg-gray-50">
+                <tr>
+                  <td colspan="5" class="px-6 py-4 whitespace-nowrap border-r border-gray-200 font-semibold">Summary
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap border-r border-gray-200">
+                    <div class="flex flex-col space-y-1">
+                      <div class="flex items-center space-x-2">
+                        <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                        <span class="text-xs">In Progress: <span
+                            x-text="getPercentage(getSummary(tableData.tasks).statusCounts['In Progress'] || 0, tableData.tasks.length)"></span></span>
+                      </div>
+                      <div class="flex items-center space-x-2">
+                        <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                        <span class="text-xs">Working On: <span
+                            x-text="getPercentage(getSummary(tableData.tasks).statusCounts['Working On'] || 0, tableData.tasks.length)"></span></span>
+                      </div>
+                      <div class="flex items-center space-x-2">
+                        <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                        <span class="text-xs">Done: <span
+                            x-text="getPercentage(getSummary(tableData.tasks).statusCounts['Done'] || 0, tableData.tasks.length)"></span></span>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap border-r border-gray-200">
+                    <div class="flex flex-col space-y-1">
+                      <div class="flex items-center space-x-2">
+                        <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                        <span class="text-xs">High: <span
+                            x-text="getPercentage(getSummary(tableData.tasks).priorityCounts['High'] || 0, tableData.tasks.length)"></span></span>
+                      </div>
+                      <div class="flex items-center space-x-2">
+                        <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                        <span class="text-xs">Medium: <span
+                            x-text="getPercentage(getSummary(tableData.tasks).priorityCounts['Medium'] || 0, tableData.tasks.length)"></span></span>
+                      </div>
+                      <div class="flex items-center space-x-2">
+                        <div class="w-3 h-3 rounded-full bg-indigo-500"></div>
+                        <span class="text-xs">Low: <span
+                            x-text="getPercentage(getSummary(tableData.tasks).priorityCounts['Low'] || 0, tableData.tasks.length)"></span></span>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap border-r border-gray-200 font-semibold"
+                    x-text="getSummary(tableData.tasks).totalFiles"></td>
+                  <td class="px-6 py-4 whitespace-nowrap font-semibold"
+                    x-text="getSummary(tableData.tasks).totalSeniorHours"></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </template>
+    </div>
+  </body>
+
+</html>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2/dist/alpine.min.js" defer></script>
+</head>
+
+<body class=" p-6">
+    <div class="mb-10">
+        <div class="grid w-full place-items-start overflow-x-scroll rounded-lg lg:overflow-visible">
+            <div class="flex divide-x divide-gray-800 row">
+                <button @click="changeContent('dashboard')"
+                    class="align-middle select-none font-sans font-bold text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 px-6 rounded-lg bg-gray-100 text-black shadow-md shadow-gray-900/10 hover:shadow-lg hover:shadow-gray-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none rounded-r-none border-r-0"
+                    :class="{ 'bg-blue-700 text-white': currentContent === 'dashboard' }"
+                    type="button">
+                    <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="flex flex-col md:flex-row justify-between items-start mb-6 space-y-4 md:space-y-0">
+        <h1 class="text-3xl font-bold">Dashboard</h1>
+        <div x-data="{ currentDate: new Date('2024-01-20') }">
+            <button class="bg-white px-4 py-2 rounded-md shadow flex items-center">
+                <i class="fas fa-calendar-alt mr-2"></i>
+                <span x-text="currentDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })"></span>
+            </button>
+        </div>
+    </div>
+
+    <div class="flex flex-col md:flex-row justify-between items-center mb-6 space-y-4 md:space-y-0">
+        <div class="relative flex items-center w-full md:w-auto mt-4 md:mt-0">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" class="w-5 h-5 text-gray-400 dark:text-gray-600">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                </svg>
+            </span>
+
+            <input type="text" placeholder="Search"
+                class="bg-gray-100 block w-full py-2 pr-5 text-gray-700 border border-gray-200 rounded-lg md:w-80 placeholder-gray-400 pl-10 rtl:pr-11 rtl:pl-5 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-300 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40">
+        </div>
+        <div class="flex justify-center md:justify-start w-full md:w-auto">
+            <button
+                class="flex items-center justify-center w-full md:w-auto px-5 py-2 text-sm tracking-wide text-white transition-colors duration-200 bg-black rounded-lg gap-x-2">
+                <i class="fas fa-download"></i>
+                <span>Download</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="bg-white shadow-xl rounded-lg overflow-hidden">
+            <div class="flex justify-between items-center  p-4">
+                <div class="text-lg font-medium">Total Revenue</div>
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                        stroke-width="2" class="h-4 w-4 text-gray-400">
+                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                    </svg>
+                </div>
+            </div>
+            <div class="p-4">
+                <p class="text-2xl font-bold">$45,231.89</p>
+                <p class="text-sm text-gray-500">+20.1% from last month</p>
+            </div>
+        </div>
+
+        <div class="bg-white shadow-xl rounded-lg overflow-hidden">
+            <div class="flex justify-between items-center  p-4">
+                <div class="text-lg font-medium">Expense</div>
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                        stroke-width="2" class="h-4 w-4 text-gray-400">
+                        <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                    </svg>
+                </div>
+            </div>
+            <div class="p-4">
+                <p class="text-2xl font-bold">$45,231.89</p>
+                <p class="text-sm text-gray-500">+20.1% from last month</p>
+            </div>
+        </div>
+
+        <div class="bg-white shadow-xl rounded-lg overflow-hidden">
+            <div class="flex justify-between items-center  p-4">
+                <div class="text-lg font-medium">Sales</div>
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                        stroke-width="2" class="h-4 w-4 text-gray-400">
+                        <rect width="20" height="14" x="2" y="5" rx="2"></rect>
+                        <path d="M2 10h20"></path>
+                    </svg>
+                </div>
+            </div>
+            <div class="p-4">
+                <p class="text-2xl font-bold">$45,231.89</p>
+                <p class="text-sm text-gray-500">+20.1% from last month</p>
+            </div>
+        </div>
+
+        <div class="bg-white shadow-xl rounded-lg overflow-hidden">
+            <div class="flex justify-between items-center  p-4">
+                <div class="text-lg font-medium">Invoices</div>
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                        stroke-width="2" class="h-4 w-4 text-gray-400">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                </div>
+            </div>
+            <div class="p-4">
+                <p class="text-2xl font-bold">$45,231.89</p>
+                <p class="text-sm text-gray-500">+20.1% from last month</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
+        <div class="overflow-x-auto shadow-lg bg-white rounded-md">
+            <div class="px-4 py-3 border-b border-gray-200">
+                <h2 class="text-xl font-bold text-gray-900">Recent Expenses</h2>
+                <p class="text-sm text-gray-500">You made 265 sales this month</p>
+            </div>
+            <table class="min-w-full divide-y divide-gray-200">
+                <tbody class="bg-white">
+                    <template x-for="i in 6" :key="i">
+                        <tr class="transition-all hover: hover:shadow-lg">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 w-10 h-10">
+                                        <img class="object-cover w-full h-full rounded-full"
+                                            src="https://img.freepik.com/free-photo/young-beautiful-woman-pink-warm-sweater-natural-look-smiling-portrait-isolated-long-hair_285396-896.jpg?size=626&ext=jpg&uid=R75331262&ga=GA1.1.1292211247.1718182866&semt=sph"
+                                            alt="Profile picture" />
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">Ahmed Kamel</div>
+                                        <div class="text-sm text-gray-500">ahmed.kamel@example.com</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">$1,999.00</div>
+                            </td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="overflow-x-auto shadow-lg bg-white rounded-md">
+            <div class="px-4 py-3 border-b border-gray-200">
+                <h2 class="text-xl font-bold text-gray-900">Recent Income</h2>
+                <p class="text-sm text-gray-500">You made 265 sales this month</p>
+            </div>
+            <table class="min-w-full divide-y divide-gray-200">
+                <tbody class="bg-white">
+                    <template x-for="i in 6" :key="i">
+                        <tr class="transition-all hover: hover:shadow-lg">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 w-10 h-10">
+                                        <img class="object-cover w-full h-full rounded-full"
+                                            src="https://img.freepik.com/free-photo/young-beautiful-woman-pink-warm-sweater-natural-look-smiling-portrait-isolated-long-hair_285396-896.jpg?size=626&ext=jpg&uid=R75331262&ga=GA1.1.1292211247.1718182866&semt=sph"
+                                            alt="Profile picture" />
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">Ahmed Kamel</div>
+                                        <div class="text-sm text-gray-500">ahmed.kamel@example.com</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">$1,999.00</div>
+                            </td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-1 gap-6 mt-10">
+        <div class="w-full">
+            <div class="overflow-x-auto shadow-lg bg-white rounded-md">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-2xl font-bold text-gray-900">Expenses Overview</h2>
+                        <div class="relative">
+                            <select id="chartToggle" class="appearance-none bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-lg leading-tight focus:outline-none focus:bg-white focus:border-gray-500 shadow-sm">
+                                <option value="monthly">Monthly (This Year)</option>
+                                <option value="yearly">Last 5 Years</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-500">You made 265 sales this month</p>
+                </div>
+                <div class="bg-white rounded-lg overflow-hidden p-6" style="height: 50vh; min-height: 300px;">
+                    <canvas id="expenseChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</body>
+
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Dashboard</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<style>
+		[x-cloak] {
+			display: none !important;
+		}
+
+		.sidebar-transition {
+			transition: transform 0.3s ease-in-out, width 0.3s ease-in-out;
+		}
+
+		@media (max-width: 1023px) {
+			.sidebar-open {
+				transform: translateX(0);
+			}
+
+			.sidebar-closed {
+				transform: translateX(-100%);
+			}
+		}
+
+		[data-tooltip]:hover:after {
+			content: attr(data-tooltip);
+			position: absolute;
+			bottom: 100%;
+			left: 50%;
+			transform: translateX(-50%);
+			background-color: rgba(0, 0, 0, 0.75);
+			color: #fff;
+			padding: 0.5em 1em;
+			border-radius: 0.25em;
+			white-space: nowrap;
+			z-index: 10;
+		}
+
+		.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+    visibility: hidden;
+    opacity: 0;
+}
+	</style>
+</head>
+
+<body class="text-gray-800" x-data="dashboard">
+	<div class="flex h-screen overflow-hidden">
+		<aside class="bg-white shadow-lg fixed lg:relative z-20 h-full w-64 sidebar-transition"
+			:class="{ 'sidebar-open': sidebarOpen, 'sidebar-closed': !sidebarOpen }">
+			<nav class="h-full flex flex-col">
+				<div class="p-4 flex flex-col items-center border-b border-gray-200">
+					<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkEDXuxoiPnWDkwgYh0lPbk56IHIcb7SRDXg&s"
+						alt="Logo" class="w-36 h-full mb-2">
+					<button @click="toggleSidebar()"
+						class="lg:hidden absolute top-4 right-4 p-2 rounded-full bg-white hover:bg-gray-200 transition-colors duration-200 z-10">
+						<i class="fas fa-times text-gray-600"></i>
+					</button>
+				</div>
+				<ul class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+					<div class="flex flex-col space-y-2">
+						<button @click="changeContent('dashboard')"
+							class="flex items-center p-2 rounded-lg transition-all duration-200 hover:bg-gray-100"
+							:class="{ 'bg-blue-500 text-white hover:bg-blue-600': currentContent === 'dashboard' }">
+							<i class="fas fa-fw fa-tachometer-alt mr-3 text-lg"></i>
+							<span class="text-sm">Dashboard</span>
+						</button>
+					</div>
+					<li x-data="{ open: false }">
+						<a href="#" @click="open = !open; selectMainHeading('Task Management')"
+							class="flex items-center justify-between p-3 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:text-black"
+							:class="{ 'bg-blue-500 text-white': selectedMainHeading === 'Task Management' }">
+							<div class="flex items-center">
+								<i class="fa-solid fa-bars-progress mr-3 text-lg"></i>
+								<span class="text-sm font-medium">Task Management</span>
+							</div>
+							<i class="fas" :class="open ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+						</a>
+						<div x-show="open" x-transition class="ml-6 mt-2 space-y-2">
+							<div class="flex flex-col space-y-2">
+								<button @click="changeContent('management/tasks')"
+									class="flex items-center p-2 rounded-lg transition-all duration-200 hover:bg-gray-100"
+									:class="{ 'bg-blue-500 text-white hover:bg-blue-600': currentContent === 'management/tasks' }">
+									<i class="fa-solid fa-list-check mr-3 text-lg"></i>
+									<span class="text-sm">Tasks</span>
+								</button>
+							</div>
+							<div class="flex flex-col space-y-2">
+								<button @click="changeContent('management/kanban')"
+									class="flex items-center p-2 rounded-lg transition-all duration-200 hover:bg-gray-100"
+									:class="{ 'bg-blue-500 text-white hover:bg-blue-600': currentContent === 'management/kanban' }">
+									<i class="fa-solid fa-grip mr-3 text-lg"></i>
+									<span class="text-sm">Kanaban Board</span>
+								</button>
+							</div>
+							<div class="flex flex-col space-y-2">
+								<button @click="changeContent('management/message')"
+									class="flex items-center p-2 rounded-lg transition-all duration-200 hover:bg-gray-100"
+									:class="{ 'bg-blue-500 text-white hover:bg-blue-600': currentContent === 'management/message' }">
+									<i class="fa-solid fa-comment mr-3 text-lg"></i>
+									<span class="text-sm">Messages</span>
+								</button>
+							</div>
+							<div class="flex flex-col space-y-2">
+								<button @click="changeContent('management/file')"
+									class="flex items-center p-2 rounded-lg transition-all duration-200 hover:bg-gray-100"
+									:class="{ 'bg-blue-500 text-white hover:bg-blue-600': currentContent === 'management/file' }">
+									<i class="fa-solid fa-file-import mr-3 text-lg"></i>
+									<span class="text-sm">Files</span>
+								</button>
+							</div>
+						</div>
+					</li>
+				</ul>
+				<div class="border-t border-gray-200 p-4">
+					<div class="flex items-center">
+						<img src="https://img.freepik.com/free-photo/young-beautiful-woman-pink-warm-sweater-natural-look-smiling-portrait-isolated-long-hair_285396-896.jpg?size=626&ext=jpg&uid=R75331262&ga=GA1.1.1292211247.1718182866&semt=sph"
+							alt="Avatar" class="w-10 h-10 rounded-full object-cover shadow">
+						<div class="ml-3">
+							<p class="font-medium text-sm">John Doe</p>
+							<p class="text-xs text-gray-500">john@example.com</p>
+						</div>
+					</div>
+				</div>
+			</nav>
+		</aside>
+
+		<div class="flex-1 flex flex-col overflow-hidden">
+			<header class="bg-white shadow-sm p-4 flex justify-between items-center">
+				<div class="flex items-center space-x-4">
+					<button @click="toggleSidebar()"
+						class="p-2 rounded-full hover:bg-gray-100 transition-colors duration-200 lg:hidden">
+						<i class="fas" :class="sidebarOpen ? 'fa-times' : 'fa-bars'"></i>
+					</button>
+					<h1 class="text-2xl font-bold">Welcome, Admin</h1>
+				</div>
+				<div class="flex items-center space-x-4 ml-auto px-5">
+					<button class="p-2 rounded-full hover:bg-gray-100 transition-colors duration-200 relative">
+						<i class="fas fa-bell"></i>
+						<span
+							class="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">3</span>
+					</button>
+					<div class="flex items-center">
+						<img src="https://img.freepik.com/free-photo/young-beautiful-woman-pink-warm-sweater-natural-look-smiling-portrait-isolated-long-hair_285396-896.jpg?size=626&ext=jpg&uid=R75331262&ga=GA1.1.1292211247.1718182866&semt=sph"
+							alt="Avatar" class="w-10 h-10 rounded-full object-cover shadow">
+					</div>
+				</div>
+			</header>
+
+			<main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6" id="content">
+			</main>
+		</div>
+	</div>
+
+	<script src="script.js"></script>
+</body>
+
+</html>
